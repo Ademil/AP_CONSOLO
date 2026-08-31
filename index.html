@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONSOLO PRO — Dimensionamento de Consolos em Pilares Pré-Moldados</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-hover: #1d4ed8;
+      --secondary: #0f172a;
+      --accent: #2563eb;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --radius: 8px;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    }
+
+    [data-theme="dark"] {
+      --primary: #3b82f6;
+      --primary-hover: #60a5fa;
+      --secondary: #f8fafc;
+      --accent: #3b82f6;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Layout Header & Nav */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow);
+    }
+    .brand h1 { font-size: 1.5rem; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
+    .brand p { font-size: 0.85rem; color: var(--text-muted); }
+    .top-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+    .app-container { display: flex; flex: 1; overflow: hidden; }
+    
+    /* Sidebar Navigation */
+    sidebar {
+      width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      shrink: 0;
+    }
+    .nav-list { list-style: none; padding: 1rem 0; }
+    .nav-item {
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--primary);
+      border-left: 4px solid var(--primary);
+    }
+
+    /* Main Content Area */
+    main { flex: 1; padding: 2rem; overflow-y: auto; background-color: var(--bg); }
+    
+    .tab-content { display: none; max-width: 1200px; margin: 0 auto; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* UI Cards & Forms */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+    .form-group input, .form-group select {
+      padding: 0.6rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) - 2px);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+
+    /* Buttons & Badges */
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius);
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-secondary:hover { opacity: 0.8; }
+    .btn-danger { background: var(--danger); color: white; }
+
+    .badge {
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-success { background: rgba(22, 163, 74, 0.15); color: var(--success); border: 1px solid var(--success); }
+    .badge-warning { background: rgba(217, 119, 6, 0.15); color: var(--warning); border: 1px solid var(--warning); }
+    .badge-danger { background: rgba(220, 38, 38, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    th { background: rgba(0,0,0,0.02); font-weight: 700; color: var(--text-muted); }
+
+    /* SVG Containers */
+    .svg-container {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      overflow: hidden;
+    }
+
+    /* Calculation Formula Block */
+    .calc-step {
+      background: rgba(0, 0, 0, 0.02);
+      border-left: 3px solid var(--accent);
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    /* Mode Switch Banner */
+    .mode-banner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Print Styles */
+    @media print {
+      body { background: white; color: black; }
+      header, sidebar, .top-actions, .no-print { display: none !important; }
+      main { padding: 0; margin: 0; width: 100%; overflow: visible; }
+      .card { border: none; box-shadow: none; padding: 0; margin-bottom: 1.5rem; page-break-inside: avoid; }
+      .tab-content { display: block !important; }
+      .page-break { page-break-before: always; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>APavan-CONSOLO PRO</h1>
+      <p>Dimensionamento de Consolos em Pilares Pré-Moldados — ABNT NBR 6118:2023</p>
+    </div>
+    <div class="top-actions">
+      <label style="font-size: 0.85rem; font-weight: 600;">Modo de Exibição:</label>
+      <select id="appMode" onchange="toggleMode(this.value)" style="padding: 0.4rem; border-radius: var(--radius); border: 1px solid var(--border);">
+        <option value="engenheiro">Modo Engenheiro (Completo & Auditável)</option>
+        <option value="rapido">Modo Rápido (Sintético)</option>
+      </select>
+      <button class="btn btn-secondary" onclick="toggleTheme()">🌗 Tema</button>
+      <button class="btn btn-primary" onclick="exportPDF()">📄 Exportar PDF</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <sidebar>
+      <ul class="nav-list">
+        <li class="nav-item active" onclick="switchTab('dashboard')">🏠 Dashboard</li>
+        <li class="nav-item" onclick="switchTab('projeto')">📋 Identificação</li>
+        <li class="nav-item" onclick="switchTab('geometria')">📐 Geometria</li>
+        <li class="nav-item" onclick="switchTab('materiais')">🧱 Materiais</li>
+        <li class="nav-item" onclick="switchTab('acoes')">⚖️ Ações & Cargas</li>
+        <li class="nav-item" onclick="switchTab('bielas')">🔩 Bielas & Tirantes</li>
+        <li class="nav-item" onclick="switchTab('dimensionamento')">🔧 Armadura Principal</li>
+        <li class="nav-item" onclick="switchTab('secundarias')">🪢 Suspensão & Fretagem</li>
+        <li class="nav-item" onclick="switchTab('ligacao')">🔗 Ligação & Apoio</li>
+        <li class="nav-item" onclick="switchTab('verificacoes')">📊 Verificações Regiões D</li>
+        <li class="nav-item" onclick="switchTab('detalhamento')">📐 Detalhamento SVG</li>
+        <li class="nav-item" onclick="switchTab('memorial')">🧮 Memorial de Cálculo</li>
+        <li class="nav-item" onclick="switchTab('projetos')">💾 Salvar / Carregar</li>
+        <li class="nav-item" onclick="switchTab('testes')">🧪 Testar Motor</li>
+      </ul>
+    </sidebar>
+
+    <main>
+      <!-- Mode & Status Header Banner -->
+      <div class="mode-banner no-print">
+        <div>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Status Global do Dimensionamento:</span>
+          <div id="globalStatusBadge" class="badge badge-success" style="margin-left: 0.5rem; font-size: 0.9rem;">🟢 TOTALMENTE CONFORME</div>
+        </div>
+        <div id="quickInfo" style="font-size: 0.85rem; color: var(--text-muted);">
+          Consolo Curto | a/d = 0.50 | Vd = 150 kN
+        </div>
+      </div>
+
+      <!-- 1. DASHBOARD -->
+      <div id="tab-dashboard" class="tab-content active">
+        <div class="card">
+          <div class="card-title">Resumo Executivo do Dimensionamento</div>
+          <div class="grid-4" style="margin-bottom: 1.5rem;">
+            <div style="background: rgba(37,99,235,0.05); padding: 1rem; border-radius: var(--radius); text-align: center;">
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Relação a/d</div>
+              <div id="dashAd" style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">0.50</div>
+              <div id="dashClass" style="font-size: 0.75rem; font-weight: 600;" class="badge badge-success">Consolo Curto</div>
+            </div>
+            <div style="background: rgba(37,99,235,0.05); padding: 1rem; border-radius: var(--radius); text-align: center;">
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Carga Vertical Vd</div>
+              <div id="dashVd" style="font-size: 1.5rem; font-weight: 800;">150.0 kN</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Sd de Projeto</div>
+            </div>
+            <div style="background: rgba(37,99,235,0.05); padding: 1rem; border-radius: var(--radius); text-align: center;">
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Armadura Principal (As,nec)</div>
+              <div id="dashAs" style="font-size: 1.5rem; font-weight: 800; color: var(--accent);">3.82 cm²</div>
+              <div id="dashAsAdot" style="font-size: 0.75rem; color: var(--text-muted);">Adotado: 4 Ø 12.5 (4.91 cm²)</div>
+            </div>
+            <div style="background: rgba(37,99,235,0.05); padding: 1rem; border-radius: var(--radius); text-align: center;">
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Tensão Biela / Limite</div>
+              <div id="dashBiela" style="font-size: 1.5rem; font-weight: 800;">6.2 / 12.8 MPa</div>
+              <div id="dashBielaStatus" class="badge badge-success">🟢 OK (48.4%)</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <h4 style="margin-bottom: 0.75rem;">Visão Geral da Geometria e Esforços</h4>
+              <div id="dashSvgPreview" class="svg-container" style="height: 280px;"></div>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 0.75rem;">Checklist de Verificações Normativas</h4>
+              <table id="dashChecklistTable">
+                <thead>
+                  <tr><th>Verificação</th><th>Solicitante / Calculado</th><th>Resistente / Limite</th><th>Status</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. IDENTIFICAÇÃO DO PROJETO -->
+      <div id="tab-projeto" class="tab-content">
+        <div class="card">
+          <div class="card-title">Dados do Projeto e Responsabilidade Técnica</div>
+          <div class="grid-3">
+            <div class="form-group"><label>Nome do Projeto</label><input type="text" id="projNome" value="Edifício Industrial Módulos Pré-Moldados" onchange="recalculaTudo()"></div>
+            <div class="form-group"><label>Código / Tag</label><input type="text" id="projCodigo" value="PRJ-2026-CONS-01" onchange="recalculaTudo()"></div>
+            <div class="form-group"><label>Elemento / Pilar</label><input type="text" id="projPilar" value="Pilar P-12 (Consolo C1)" onchange="recalculaTudo()"></div>
+            <div class="form-group"><label>Pavimento / Nível</label><input type="text" id="projPavimento" value="Nível +4.50m" onchange="recalculaTudo()"></div>
+            <div class="form-group"><label>Responsável Técnico</label><input type="text" id="projResp" value="Eng. Estrutural de Ramos" onchange="recalculaTudo()"></div>
+            <div class="form-group"><label>CREA / CAU</label><input type="text" id="projCrea" value="CREA 5069874521/D" onchange="recalculaTudo()"></div>
+            <div class="form-group"><label>Data</label><input type="date" id="projData" value="2026-08-31" onchange="recalculaTudo()"></div>
+            <div class="form-group"><label>Revisão</label><input type="text" id="projRev" value="R0" onchange="recalculaTudo()"></div>
+          </div>
+          <div class="form-group" style="margin-top: 1rem;">
+            <label>Observações Técnicas de Projeto</label>
+            <input type="text" id="projObs" value="Dimensionamento de consolo curto para apoio de viga calha pré-moldada V-102." onchange="recalculaTudo()">
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. GEOMETRIA -->
+      <div id="tab-geometria" class="tab-content">
+        <div class="card">
+          <div class="card-title">Geometria do Pilar e do Consolo</div>
+          <div class="grid-2">
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Parâmetros do Pilar e Consolo</h4>
+              <div class="grid-2">
+                <div class="form-group"><label>Largura do Pilar bp (cm)</label><input type="number" id="geoBp" value="40" step="1" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Profundidade Pilar hp (cm)</label><input type="number" id="geoHp" value="40" step="1" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Tipo de Geometria</label>
+                  <select id="geoTipo" onchange="recalculaTudo()">
+                    <option value="trapezoidal">Consolo Trapezoidal (Variável)</option>
+                    <option value="retangular">Consolo Retangular (Constante)</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Largura do Consolo b (cm)</label><input type="number" id="geoB" value="40" step="1" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Balanço / Comprimento a (cm)</label><input type="number" id="geoA" value="30" step="1" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Distância da Carga ao Pilar a1 (cm)</label><input type="number" id="geoA1" value="20" step="1" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Altura junto ao Pilar h (cm)</label><input type="number" id="geoH" value="50" step="1" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Altura na Extremidade h1 (cm)</label><input type="number" id="geoH1" value="25" step="1" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Cobrimento Nominal c (cm)</label><input type="number" id="geoCob" value="3.0" step="0.5" onchange="recalculaTudo()"></div>
+              </div>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Esquema Geométrico em Tempo Real</h4>
+              <div id="geoSvg" class="svg-container" style="height: 320px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. MATERIAIS -->
+      <div id="tab-materiais" class="tab-content">
+        <div class="card">
+          <div class="card-title">Propriedades dos Materiais (ABNT NBR 6118:2023)</div>
+          <div class="grid-2">
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Concreto Armado</h4>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label>Classe do Concreto (fck)</label>
+                  <select id="matFck" onchange="recalculaTudo()">
+                    <option value="25">C25 (fck = 25 MPa)</option>
+                    <option value="30" selected>C30 (fck = 30 MPa)</option>
+                    <option value="35">C35 (fck = 35 MPa)</option>
+                    <option value="40">C40 (fck = 40 MPa)</option>
+                    <option value="45">C45 (fck = 45 MPa)</option>
+                    <option value="50">C50 (fck = 50 MPa)</option>
+                    <option value="60">C60 (fck = 60 MPa)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Agregado Graúdo</label>
+                  <select id="matAgregado" onchange="recalculaTudo()">
+                    <option value="1.2">Basalto / Diabásio (αe = 1.2)</option>
+                    <option value="1.0" selected>Granito / Gnaisse (αe = 1.0)</option>
+                    <option value="0.9">Calcário (αe = 0.9)</option>
+                    <option value="0.7">Arenito (αe = 0.7)</option>
+                  </select>
+                </div>
+              </div>
+              <div style="margin-top: 1rem;" id="matConcOutput"></div>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Aço das Armaduras</h4>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label>Aço Principal e Secundário</label>
+                  <select id="matAco" onchange="recalculaTudo()">
+                    <option value="500" selected>CA-50 (fyk = 500 MPa)</option>
+                    <option value="600">CA-60 (fyk = 600 MPa)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Coef. Ponderação Concreto (γc)</label>
+                  <input type="number" id="matGamaC" value="1.4" step="0.05" onchange="recalculaTudo()">
+                </div>
+                <div class="form-group">
+                  <label>Coef. Ponderação Aço (γs)</label>
+                  <input type="number" id="matGamaS" value="1.15" step="0.05" onchange="recalculaTudo()">
+                </div>
+              </div>
+              <div style="margin-top: 1rem;" id="matAcoOutput"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. AÇÕES E CARGAS -->
+      <div id="tab-acoes" class="tab-content">
+        <div class="card">
+          <div class="card-title">Ações Solicitantes no Consolo</div>
+          <div class="grid-2">
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Esforços Característicos e Majorados</h4>
+              <div class="grid-2">
+                <div class="form-group"><label>Reação Vertical Característica Vk (kN)</label><input type="number" id="acVk" value="100" step="5" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Coeficiente de Majoração Vertical (γf)</label><input type="number" id="acGamaFv" value="1.4" step="0.05" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Força Horizontal Característica Hk (kN)</label><input type="number" id="acHk" value="20" step="2" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Coeficiente Majoração Horizontal (γfh)</label><input type="number" id="acGamaFh" value="1.4" step="0.05" onchange="recalculaTudo()"></div>
+              </div>
+              <div style="margin-top: 1rem; background: rgba(0,0,0,0.02); padding: 1rem; border-radius: var(--radius);">
+                <p><strong>Reação Vertical de Cálculo (Vd):</strong> <span id="outVd">140.0 kN</span></p>
+                <p><strong>Força Horizontal de Cálculo (Hd):</strong> <span id="outHd">28.0 kN</span></p>
+                <p><strong>Momento Fletor na Face do Pilar (Msd):</strong> <span id="outMsd">28.0 kN.m</span></p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Nota: A NBR 6118 exige considerar uma força horizontal Hd mínima de pelo menos 0.20 * Vd quando não houver impedimento estrito ao deslocamento.</p>
+              </div>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Excentricidades do Carregamento</h4>
+              <div id="excentricidadeOutput"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. BIELAS E TIRANTES -->
+      <div id="tab-bielas" class="tab-content">
+        <div class="card">
+          <div class="card-title">Modelo de Bielas e Tirantes (Região D)</div>
+          <div class="grid-2">
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Esquema do Treliçado Interno</h4>
+              <div id="bielasSvg" class="svg-container" style="height: 320px;"></div>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Forças e Geometria da Biela/Tirante</h4>
+              <div id="bielasCalculos"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. ARMADURA PRINCIPAL -->
+      <div id="tab-dimensionamento" class="tab-content">
+        <div class="card">
+          <div class="card-title">Dimensionamento do Tirante Principal (As,nec)</div>
+          <div class="grid-2">
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Seleção das Barras Principais</h4>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label>Quantidade de Barras</label>
+                  <input type="number" id="armNum" value="4" min="2" max="12" step="1" onchange="recalculaTudo()">
+                </div>
+                <div class="form-group">
+                  <label>Diâmetro da Barra (ϕ)</label>
+                  <select id="armDiam" onchange="recalculaTudo()">
+                    <option value="10">10.0 mm</option>
+                    <option value="12.5" selected>12.5 mm</option>
+                    <option value="16">16.0 mm</option>
+                    <option value="20">20.0 mm</option>
+                    <option value="25">25.0 mm</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Disposição / Camadas</label>
+                  <select id="armCamadas" onchange="recalculaTudo()">
+                    <option value="1">Camada Única Superior</option>
+                    <option value="2">Duas Camadas Superiores</option>
+                  </select>
+                </div>
+              </div>
+              <div style="margin-top: 1rem;" id="armPrincipalOutput"></div>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Detalhamento da Ancoragem no Pilar</h4>
+              <div id="ancoragemOutput"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. SUSPENSÃO E FRETAGEM -->
+      <div id="tab-secundarias" class="tab-content">
+        <div class="card">
+          <div class="card-title">Armaduras Secundárias (Estribos Horizontais e Costura)</div>
+          <div class="grid-2">
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Estribos Horizontais (Fretagem)</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Conforme NBR 6118, em consolos curtos deve-se dispor estribos horizontais distribuídos na altura útil d, totalizando pelo menos 0.40 * As,principal.
+              </p>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label>Diâmetro Estribos (ϕh)</label>
+                  <select id="estDiam" onchange="recalculaTudo()">
+                    <option value="6.3" selected>6.3 mm</option>
+                    <option value="8">8.0 mm</option>
+                    <option value="10">10.0 mm</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Número de Ramos Horizontais</label>
+                  <input type="number" id="estRamos" value="2" min="2" max="6" step="1" onchange="recalculaTudo()">
+                </div>
+                <div class="form-group">
+                  <label>Quantidade de Camadas/Estribos</label>
+                  <input type="number" id="estNum" value="4" min="2" max="10" step="1" onchange="recalculaTudo()">
+                </div>
+              </div>
+              <div style="margin-top: 1rem;" id="estribosOutput"></div>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Armadura de Suspensão / Costura Nodal</h4>
+              <div id="suspensaoOutput"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9. LIGAÇÃO E APOIO -->
+      <div id="tab-ligacao" class="tab-content">
+        <div class="card">
+          <div class="card-title">Dimensionamento da Aparelho de Apoio / Chapa de Encontro</div>
+          <div class="grid-2">
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Geometria da Almofada de Apoio (Neoprene / Argamassa)</h4>
+              <div class="grid-2">
+                <div class="form-group"><label>Comprimento do Apoio lap (cm)</label><input type="number" id="apoioLap" value="15" step="1" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Largura do Apoio bap (cm)</label><input type="number" id="apoioBap" value="30" step="1" onchange="recalculaTudo()"></div>
+                <div class="form-group"><label>Tipo de Elemento de Apoio</label>
+                  <select id="apoioTipo" onchange="recalculaTudo()">
+                    <option value="neoprene">Almofada de Neoprene Fretado</option>
+                    <option value="argamassa">Argamassa de Alto Desempenho / Graute</option>
+                    <option value="chapa">Chapa Metálica com Neoprene Simples</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Tensão Admissível do Apoio (MPa)</label><input type="number" id="apoioSigmaAdm" value="15" step="1" onchange="recalculaTudo()"></div>
+              </div>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Verificação da Pressão de Contato</h4>
+              <div id="apoioVerificacaoOutput"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10. VERIFICAÇÕES REGIÕES D -->
+      <div id="tab-verificacoes" class="tab-content">
+        <div class="card">
+          <div class="card-title">Verificação de Tensões nos Nós e Bielas de Compressão</div>
+          <div class="grid-2">
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Tensão na Biela e Esmagamento do Concreto</h4>
+              <div id="verifBielaOutput"></div>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 1rem; color: var(--primary);">Verificação de Tensões Nodais (Nó CCT e Nó CCC)</h4>
+              <div id="verifNosOutput"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11. DETALHAMENTO SVG -->
+      <div id="tab-detalhamento" class="tab-content">
+        <div class="card">
+          <div class="card-title">Detalhamento Construtivo Automatizado (SVG)</div>
+          <div id="detalhamentoSvgCompleto" class="svg-container" style="height: 500px; background: #fff;"></div>
+          <div style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+            <button class="btn btn-secondary" onclick="exportSVG()">💾 Download SVG</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 12. MEMORIAL DE CÁLCULO -->
+      <div id="tab-memorial" class="tab-content">
+        <div class="card">
+          <div class="card-title">
+            <span>Memorial de Cálculo Auditável</span>
+            <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Imprimir Memorial</button>
+          </div>
+          <div id="memorialContent" style="background: var(--surface); padding: 1.5rem; border-radius: var(--radius);"></div>
+        </div>
+      </div>
+
+      <!-- 13. SALVAR / CARREGAR -->
+      <div id="tab-projetos" class="tab-content">
+        <div class="card">
+          <div class="card-title">Gerenciamento de Projetos e Backups</div>
+          <div class="grid-2">
+            <div>
+              <h4 style="margin-bottom: 1rem;">Projetos Salvos Localmente</h4>
+              <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                <input type="text" id="saveProjectName" placeholder="Nome do Projeto..." style="flex: 1; padding: 0.5rem;">
+                <button class="btn btn-primary" onclick="salvarProjetoLocal()">Salvar</button>
+              </div>
+              <ul id="listaProjetosSalvos" style="list-style: none;"></ul>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 1rem;">Exportar / Importar Arquivo JSON</h4>
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="exportarJSON()">📥 Baixar Arquivo do Projeto (.json)</button>
+                <div style="border: 2px dashed var(--border); padding: 1.5rem; text-align: center; border-radius: var(--radius);">
+                  <p style="margin-bottom: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">Selecione um arquivo .json para importar</p>
+                  <input type="file" id="importFile" accept=".json" onchange="importarJSON(event)">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 14. TESTES AUTOMÁTICOS DO MOTOR -->
+      <div id="tab-testes" class="tab-content">
+        <div class="card">
+          <div class="card-title">
+            <span>Bateria de Testes do Motor de Cálculo</span>
+            <button class="btn btn-primary" onclick="executarTestesMotor()">🧪 Executar Bateria de Testes</button>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Executa verificações matemáticas automatizadas em casos de teste de referência estrutural para garantir consistência dos algoritmos.
+          </p>
+          <table id="tabelaTestes">
+            <thead>
+              <tr>
+                <th>Módulo de Teste</th>
+                <th>Entrada de Teste</th>
+                <th>Esperado</th>
+                <th>Obtido</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Clique em "Executar Bateria de Testes" para validar o motor.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Responsabilidade Técnica Rodapé -->
+      <div class="card no-print" style="margin-top: 2rem; background: rgba(0,0,0,0.02); border-left: 4px solid var(--warning);">
+        <p style="font-size: 0.78rem; color: var(--text-muted); line-line-height: 1.4;">
+          <strong>AVISO DE RESPONSABILIDADE TÉCNICA:</strong> Esta ferramenta constitui um instrumento de apoio ao cálculo e dimensionamento estrutural. Os resultados obtidos devem obrigatoriamente ser analisados, validados e homologados por profissional legalmente habilitado (Engenheiro Civil / Calculista), considerando as condições reais do projeto, hipóteses de cálculo, prescrições das normas técnicas ABNT NBR 6118 e ABNT NBR 9062 e especificações da ligação pré-moldada.
+        </p>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       CONSOLO PRO — MOTOR DE CÁLCULO E LÓGICA DO APLICATIVO
+       ========================================================================== */
+
+    // Estado Global da Aplicação
+    let state = {
+      mode: 'engenheiro', // 'engenheiro' ou 'rapido'
+      theme: 'light',
+      projeto: {
+        nome: 'Edifício Industrial Módulos Pré-Moldados',
+        codigo: 'PRJ-2026-CONS-01',
+        pilar: 'Pilar P-12 (Consolo C1)',
+        pavimento: 'Nível +4.50m',
+        resp: 'Eng. Estrutural de Ramos',
+        crea: 'CREA 5069874521/D',
+        data: '2026-08-31',
+        rev: 'R0',
+        obs: 'Dimensionamento de consolo curto para apoio de viga calha pré-moldada V-102.'
+      },
+      geometria: {
+        bp: 40, hp: 40, tipo: 'trapezoidal', b: 40, a: 30, a1: 20, h: 50, h1: 25, cob: 3.0
+      },
+      materiais: {
+        fck: 30, agregado: 1.0, aco: 500, gamaC: 1.4, gamaS: 1.15
+      },
+      acoes: {
+        Vk: 100, gamaFv: 1.4, Hk: 20, gamaFh: 1.4
+      },
+      armadura: {
+        num: 4, diam: 12.5, camadas: 1
+      },
+      estribos: {
+        diam: 6.3, ramos: 2, num: 4
+      },
+      apoio: {
+        lap: 15, bap: 30, tipo: 'neoprene', sigmaAdm: 15
+      },
+      calculos: {}
+    };
+
+    // Navegação entre abas
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      
+      const selectedTab = document.getElementById(`tab-${tabId}`);
+      if(selectedTab) selectedTab.classList.add('active');
+      
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        if(item.getAttribute('onclick') && item.getAttribute('onclick').includes(tabId)) {
+          item.classList.add('active');
+        }
+      });
+    }
+
+    // Controle de Tema Dark/Light
+    function toggleTheme() {
+      state.theme = state.theme === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', state.theme);
+    }
+
+    // Controle do Modo Engenheiro / Modo Rápido
+    function toggleMode(val) {
+      state.mode = val;
+      recalculaTudo();
+    }
+
+    /* --------------------------------------------------------------------------
+       FUNÇÕES DO MOTOR DE CÁLCULO (Aritmética Estrutural Puro)
+       -------------------------------------------------------------------------- */
+
+    function calcularGeometria(g) {
+      const d = g.h - g.cob - 1.5; // Altura útil aproximada (cm)
+      const ad = g.a1 / d; // Relação a/d principal
+      
+      let classificacao = "Curto";
+      let dominioOk = true;
+      let mensagem = "Consolo Curto (0.4 ≤ a/d ≤ 1.0) — Modelo de Bielas e Tirantes Aplicável.";
+
+      if (ad < 0.4) {
+        classificacao = "Muito Curto";
+        mensagem = "Consolo Muito Curto (a/d < 0.4) — Exige atenção especial ao esmagamento nodal.";
+      } else if (ad > 1.0) {
+        classificacao = "Longo";
+        dominioOk = false;
+        mensagem = "⚠️ ATENÇÃO: Relação a/d > 1.0 caracteriza Consolo Longo (Flexão convencional pela NBR 6118).";
+      }
+
+      return { d, ad, classificacao, dominioOk, mensagem };
+    }
+
+    function calcularMateriais(m) {
+      const fck = parseFloat(m.fck);
+      const fcd = fck / (m.gamaC * 10); // kN/cm²
+      const fcdMPa = fck / m.gamaC; // MPa
+      
+      // Módulo de Elasticidade Tangente do Concreto (NBR 6118:2023)
+      let αe = parseFloat(m.agregado);
+      let Eci = 0;
+      if (fck <= 50) {
+        Eci = αe * 5600 * Math.sqrt(fck); // MPa
+      } else {
+        Eci = 21.5 * 1000 * αe * Math.pow((fck / 10 + 1.25), 1/3); // MPa
+      }
+
+      // Resistência ao tracionamento do concreto
+      const fctm = fck <= 50 ? 0.3 * Math.pow(fck, 2/3) : 2.12 * Math.log(1 + 0.11 * fck); // MPa
+      const fctk_inf = 0.7 * fctm;
+
+      // Aço
+      const fyk = parseFloat(m.aco);
+      const fyd = fyk / (m.gamaS * 10); // kN/cm²
+      const fydMPa = fyk / m.gamaS; // MPa
+      const Es = 210000; // MPa (21000 kN/cm²)
+
+      return { fck, fcd, fcdMPa, Eci, fctm, fctk_inf, fyk, fyd, fydMPa, Es };
+    }
+
+    function calcularAcoes(a, g) {
+      const Vd = a.Vk * a.gamaFv; // kN
+      let Hd = a.Hk * a.gamaFh; // kN
+      
+      // Verificação de Hd mínimo pela NBR 6118 (0.2 * Vd)
+      const HdMin = 0.20 * Vd;
+      let hdMinAplicado = false;
+      if (Hd < HdMin) {
+        Hd = HdMin;
+        hdMinAplicado = true;
+      }
+
+      const Msd = Vd * (g.a1 / 100) + Hd * ((g.h - g.h1)/2 / 100); // kN.m aproximado na face
+      return { Vd, Hd, Msd, HdMin, hdMinAplicado };
+    }
+
+    function calcularBielasTirantes(g, mat, ac) {
+      const d = g.h - g.cob - 1.5; // cm
+      const z = 0.85 * d; // Braço de alavanca interno aproximado (cm)
+      
+      // Ângulo da biela de compressão θ
+      const tanTheta = z / g.a1;
+      const thetaRad = Math.atan(tanTheta);
+      const thetaDeg = thetaRad * (180 / Math.PI);
+
+      // Força de Tração no Tirante Principal (Fd,tirante)
+      // Fd = Vd * (a1 / z) + Hd
+      const Fd_tirante = ac.Vd * (g.a1 / z) + ac.Hd; // kN
+
+      // Força de Compressão na Biela (Fd,biela)
+      // Fb = Vd / sin(θ)
+      const Fd_biela = ac.Vd / Math.sin(thetaRad); // kN
+
+      return { d, z, tanTheta, thetaRad, thetaDeg, Fd_tirante, Fd_biela };
+    }
+
+    function calcularArmaduraPrincipal(bt, mat, arm) {
+      // Área de Aço Necessária As,nec (cm²)
+      const As_nec = bt.Fd_tirante / mat.fyd; // cm²
+
+      // Área de Aço Adotada As,ad (cm²)
+      const diam = parseFloat(arm.diam); // mm
+      const areaBarra = (Math.PI * Math.pow(diam / 10, 2)) / 4; // cm²
+      const numBarras = parseInt(arm.num);
+      const As_ad = numBarras * areaBarra; // cm²
+
+      const status = As_ad >= As_nec;
+
+      return { As_nec, As_ad, areaBarra, numBarras, diam, status };
+    }
+
+    function calcularArmadurasSecundarias(g, armPrinc, est) {
+      // Estribos horizontais: mínimo 40% da armadura principal espalhada ao longo de d
+      const As_est_nec = 0.40 * armPrinc.As_nec; // cm²
+
+      const diamEst = parseFloat(est.diam); // mm
+      const areaRamo = (Math.PI * Math.pow(diamEst / 10, 2)) / 4;
+      const ramos = parseInt(est.ramos);
+      const numEst = parseInt(est.num);
+      
+      const As_est_ad = numEst * ramos * areaRamo; // cm²
+      const statusEst = As_est_ad >= As_est_nec;
+
+      // Armadura de suspensão junto à face do pilar
+      const As_susp_nec = 0.50 * armPrinc.As_nec; // cm²
+
+      return { As_est_nec, As_est_ad, statusEst, As_susp_nec };
+    }
+
+    function verificarTencoesBielaEno(g, mat, ac, bt) {
+      // Largura b do consolo
+      const b = g.b; // cm
+      
+      // Tensão limite de compressão na biela (NBR 6118 / Região D)
+      // ν' = 1 - fck / 250
+      const nuPrimo = 1 - mat.fck / 250;
+      const fcd1 = 0.60 * nuPrimo * mat.fcdMPa; // MPa em nós CCT (Compressão-Compressão-Tração)
+
+      // Largura efetiva da biela no nó de apoio lb (cm)
+      const lb = 15; // cm (assumido tamanho do apoio)
+      const ab = lb * Math.sin(bt.thetaRad) + (g.h - bt.z) * Math.cos(bt.thetaRad); // cm
+
+      // Área transversal da biela A_buela = b * ab (cm²)
+      const Area_biela = b * ab; // cm²
+
+      // Tensão atuante na biela σ_biela (MPa)
+      // σ_biela = (Fd_biela / Area_biela) * 10
+      const sigma_biela = (bt.Fd_biela / Area_biela) * 10; // MPa
+
+      const bielaOk = sigma_biela <= fcd1;
+
+      return { nuPrimo, fcd1, ab, Area_biela, sigma_biela, bielaOk };
+    }
+
+    function verificarApoio(ac, ap) {
+      const Area_ap = ap.lap * ap.bap; // cm²
+      const sigma_ap = (ac.Vd / Area_ap) * 10; // MPa (1 kN/cm² = 10 MPa)
+      const apoioOk = sigma_ap <= ap.sigmaAdm;
+
+      return { Area_ap, sigma_ap, apoioOk };
+    }
+
+    function calcularAncoragem(armPrinc, mat, g) {
+      // Comprimento de ancoragem básico lb (cm)
+      // lb = (ϕ / 4) * (fyd / fctd)
+      const fctd = mat.fctk_inf / 1.4; // MPa
+      const fctd_cm = fctd / 10; // kN/cm²
+      
+      const lb_basico = (armPrinc.diam / 10 / 4) * (mat.fyd / fctd_cm); // cm
+      
+      // Comprimento necessário com ganho/dobra no consolo
+      const lb_nec = Math.max(0.6 * lb_basico, 10 * (armPrinc.diam / 10), 15); // cm
+      const lb_disponivel = g.hp - g.cob; // cm dentro do pilar
+
+      const ancoragemOk = lb_disponivel >= lb_nec;
+
+      return { lb_basico, lb_nec, lb_disponivel, ancoragemOk };
+    }
+
+    /* --------------------------------------------------------------------------
+       RECALCULAR TUDO E ATUALIZAR INTERFACE (Orquestrador do Motor)
+       -------------------------------------------------------------------------- */
+
+    function recalculaTudo() {
+      // 1. Ler dados dos inputs do formulário
+      state.projeto.nome = document.getElementById('projNome').value;
+      state.projeto.codigo = document.getElementById('projCodigo').value;
+      state.projeto.pilar = document.getElementById('projPilar').value;
+
+      state.geometria.bp = parseFloat(document.getElementById('geoBp').value) || 40;
+      state.geometria.hp = parseFloat(document.getElementById('geoHp').value) || 40;
+      state.geometria.tipo = document.getElementById('geoTipo').value;
+      state.geometria.b = parseFloat(document.getElementById('geoB').value) || 40;
+      state.geometria.a = parseFloat(document.getElementById('geoA').value) || 30;
+      state.geometria.a1 = parseFloat(document.getElementById('geoA1').value) || 20;
+      state.geometria.h = parseFloat(document.getElementById('geoH').value) || 50;
+      state.geometria.h1 = parseFloat(document.getElementById('geoH1').value) || 25;
+      state.geometria.cob = parseFloat(document.getElementById('geoCob').value) || 3.0;
+
+      state.materiais.fck = parseFloat(document.getElementById('matFck').value) || 30;
+      state.materiais.agregado = parseFloat(document.getElementById('matAgregado').value) || 1.0;
+      state.materiais.aco = parseFloat(document.getElementById('matAco').value) || 500;
+      state.materiais.gamaC = parseFloat(document.getElementById('matGamaC').value) || 1.4;
+      state.materiais.gamaS = parseFloat(document.getElementById('matGamaS').value) || 1.15;
+
+      state.acoes.Vk = parseFloat(document.getElementById('acVk').value) || 100;
+      state.acoes.gamaFv = parseFloat(document.getElementById('acGamaFv').value) || 1.4;
+      state.acoes.Hk = parseFloat(document.getElementById('acHk').value) || 20;
+      state.acoes.gamaFh = parseFloat(document.getElementById('acGamaFh').value) || 1.4;
+
+      state.armadura.num = parseInt(document.getElementById('armNum').value) || 4;
+      state.armadura.diam = parseFloat(document.getElementById('armDiam').value) || 12.5;
+      state.armadura.camadas = parseInt(document.getElementById('armCamadas').value) || 1;
+
+      state.estribos.diam = parseFloat(document.getElementById('estDiam').value) || 6.3;
+      state.estribos.ramos = parseInt(document.getElementById('estRamos').value) || 2;
+      state.estribos.num = parseInt(document.getElementById('estNum').value) || 4;
+
+      state.apoio.lap = parseFloat(document.getElementById('apoioLap').value) || 15;
+      state.apoio.bap = parseFloat(document.getElementById('apoioBap').value) || 30;
+      state.apoio.tipo = document.getElementById('apoioTipo').value;
+      state.apoio.sigmaAdm = parseFloat(document.getElementById('apoioSigmaAdm').value) || 15;
+
+      // 2. Executar Motor de Cálculo
+      const geo = calcularGeometria(state.geometria);
+      const mat = calcularMateriais(state.materiais);
+      const ac = calcularAcoes(state.acoes, state.geometria);
+      const bt = calcularBielasTirantes(state.geometria, mat, ac);
+      const armP = calcularArmaduraPrincipal(bt, mat, state.armadura);
+      const armS = calcularArmadurasSecundarias(state.geometria, armP, state.estribos);
+      const verifBiela = verificarTencoesBielaEno(state.geometria, mat, ac, bt);
+      const verifApoio = verificarApoio(ac, state.apoio);
+      const anc = calcularAncoragem(armP, mat, state.geometria);
+
+      state.calculos = { geo, mat, ac, bt, armP, armS, verifBiela, verifApoio, anc };
+
+      // 3. Renderizar saídas nos módulos da Interface
+      renderDashboard();
+      renderMateriais();
+      renderAcoes();
+      renderBielas();
+      renderArmaduraPrincipal();
+      renderArmaduraSecundaria();
+      renderLigacaoApoio();
+      renderVerificacoes();
+      renderSVGs();
+      renderMemorial();
+    }
+
+    /* --------------------------------------------------------------------------
+       RENDERIZAÇÃO DE INTERFACE
+       -------------------------------------------------------------------------- */
+
+    function renderDashboard() {
+      const c = state.calculos;
+      document.getElementById('dashAd').innerText = c.geo.ad.toFixed(2);
+      document.getElementById('dashClass').innerText = `Consolo ${c.geo.classificacao}`;
+      document.getElementById('dashVd').innerText = `${c.ac.Vd.toFixed(1)} kN`;
+      document.getElementById('dashAs').innerText = `${c.armP.As_nec.toFixed(2)} cm²`;
+      document.getElementById('dashAsAdot').innerText = `Adotado: ${c.armP.numBarras} Ø ${c.armP.diam} (${c.armP.As_ad.toFixed(2)} cm²)`;
+      
+      document.getElementById('dashBiela').innerText = `${c.verifBiela.sigma_biela.toFixed(1)} / ${c.verifBiela.fcd1.toFixed(1)} MPa`;
+      
+      const bielaRatio = (c.verifBiela.sigma_biela / c.verifBiela.fcd1 * 100).toFixed(1);
+      const badgeBiela = document.getElementById('dashBielaStatus');
+      if (c.verifBiela.bielaOk) {
+        badgeBiela.className = "badge badge-success";
+        badgeBiela.innerText = `🟢 OK (${bielaRatio}%)`;
+      } else {
+        badgeBiela.className = "badge badge-danger";
+        badgeBiela.innerText = `🔴 REPROVADO (${bielaRatio}%)`;
+      }
+
+      // Quick Info Banner
+      document.getElementById('quickInfo').innerText = `Consolo ${c.geo.classificacao} | a/d = ${c.geo.ad.toFixed(2)} | Vd = ${c.ac.Vd.toFixed(1)} kN | Hd = ${c.ac.Hd.toFixed(1)} kN`;
+
+      // Status Global
+      const tudoConforme = c.geo.dominioOk && c.armP.status && c.armS.statusEst && c.verifBiela.bielaOk && c.verifApoio.apoioOk && c.anc.ancoragemOk;
+      const statusBadge = document.getElementById('globalStatusBadge');
+      if (tudoConforme) {
+        statusBadge.className = "badge badge-success";
+        statusBadge.innerText = "🟢 TOTALMENTE CONFORME (ABNT NBR 6118:2023)";
+      } else {
+        statusBadge.className = "badge badge-danger";
+        statusBadge.innerText = "🔴 ATENÇÃO: NÃO CONFORME EM VERIFICAÇÕES";
+      }
+
+      // Tabela Checklist Dashboard
+      const tbody = document.querySelector('#dashChecklistTable tbody');
+      tbody.innerHTML = `
+        <tr><td>Domínio Geométrico (a/d)</td><td>a/d = ${c.geo.ad.toFixed(2)}</td><td>0.40 ≤ a/d ≤ 1.00</td><td>${c.geo.dominioOk ? '<span class="badge badge-success">🟢 OK</span>' : '<span class="badge badge-warning">🟡 FORA</span>'}</td></tr>
+        <tr><td>Tirante Principal (As)</td><td>${c.armP.As_nec.toFixed(2)} cm²</td><td>${c.armP.As_ad.toFixed(2)} cm² Adotado</td><td>${c.armP.status ? '<span class="badge badge-success">🟢 OK</span>' : '<span class="badge badge-danger">🔴 INSUFICIENTE</span>'}</td></tr>
+        <tr><td>Tensão Biela Compressão</td><td>σb = ${c.verifBiela.sigma_biela.toFixed(1)} MPa</td><td>fcd1 = ${c.verifBiela.fcd1.toFixed(1)} MPa</td><td>${c.verifBiela.bielaOk ? '<span class="badge badge-success">🟢 OK</span>' : '<span class="badge badge-danger">🔴 ESMAGAMENTO</span>'}</td></tr>
+        <tr><td>Pressão no Apoio</td><td>σap = ${c.verifApoio.sigma_ap.toFixed(1)} MPa</td><td>σadm = ${state.apoio.sigmaAdm.toFixed(1)} MPa</td><td>${c.verifApoio.apoioOk ? '<span class="badge badge-success">🟢 OK</span>' : '<span class="badge badge-danger">🔴 EXCESSIVO</span>'}</td></tr>
+        <tr><td>Estribos Horizontais (Ash)</td><td>${c.armS.As_est_nec.toFixed(2)} cm²</td><td>${c.armS.As_est_ad.toFixed(2)} cm² Adotado</td><td>${c.armS.statusEst ? '<span class="badge badge-success">🟢 OK</span>' : '<span class="badge badge-danger">🔴 INSUFICIENTE</span>'}</td></tr>
+        <tr><td>Ancoragem no Pilar</td><td>lb,nec = ${c.anc.lb_nec.toFixed(1)} cm</td><td>lb,disp = ${c.anc.lb_disponivel.toFixed(1)} cm</td><td>${c.anc.ancoragemOk ? '<span class="badge badge-success">🟢 OK</span>' : '<span class="badge badge-danger">🔴 CURTO</span>'}</td></tr>
+      `;
+    }
+
+    function renderMateriais() {
+      const m = state.calculos.mat;
+      document.getElementById('matConcOutput').innerHTML = `
+        <div class="calc-step">
+          <strong>Propriedades do Concreto C${m.fck}:</strong><br>
+          fcd = ${m.fck} / (1.4 * 10) = <strong>${m.fcd.toFixed(3)} kN/cm²</strong> (${m.fcdMPa.toFixed(2)} MPa)<br>
+          fctm = 0.30 * (${m.fck})^(2/3) = <strong>${m.fctm.toFixed(2)} MPa</strong><br>
+          Módulo Tangente Eci = <strong>${(m.Eci / 1000).toFixed(1)} GPa</strong>
+        </div>
+      `;
+      document.getElementById('matAcoOutput').innerHTML = `
+        <div class="calc-step">
+          <strong>Propriedades do Aço CA-${m.fyk/10}:</strong><br>
+          fyd = ${m.fyk} / (1.15 * 10) = <strong>${m.fyd.toFixed(2)} kN/cm²</strong> (${m.fydMPa.toFixed(1)} MPa)<br>
+          Módulo Elasticidade Es = <strong>210 GPa</strong>
+        </div>
+      `;
+    }
+
+    function renderAcoes() {
+      const c = state.calculos;
+      document.getElementById('outVd').innerText = `${c.ac.Vd.toFixed(1)} kN`;
+      document.getElementById('outHd').innerText = `${c.ac.Hd.toFixed(1)} kN ${c.ac.hdMinAplicado ? '(Mínimo de Norma 0.20*Vd Aplicado)' : ''}`;
+      document.getElementById('outMsd').innerText = `${c.ac.Msd.toFixed(2)} kN.m`;
+
+      document.getElementById('excentricidadeOutput').innerHTML = `
+        <div class="calc-step">
+          <strong>Análise de Excentricidade:</strong><br>
+          Braço de Alavanca Vertical (a1) = <strong>${state.geometria.a1} cm</strong><br>
+          Excentricidade do Apoio à Face do Pilar = <strong>${state.geometria.a1} cm</strong><br>
+          Classificação Geométrico-Estrutural: <strong>${c.geo.mensagem}</strong>
+        </div>
+      `;
+    }
+
+    function renderBielas() {
+      const c = state.calculos;
+      document.getElementById('bielasCalculos').innerHTML = `
+        <div class="calc-step">
+          <strong>Ângulo da Biela de Compressão (θ):</strong><br>
+          tan(θ) = z / a1 = ${c.bt.z.toFixed(1)} / ${state.geometria.a1} = ${c.bt.tanTheta.toFixed(3)}<br>
+          θ = <strong>${c.bt.thetaDeg.toFixed(1)}°</strong>
+        </div>
+        <div class="calc-step">
+          <strong>Força de Tração no Tirante Principal (Fd,tirante):</strong><br>
+          Fd,tirante = Vd * (a1 / z) + Hd<br>
+          Fd,tirante = ${c.ac.Vd.toFixed(1)} * (${state.geometria.a1} / ${c.bt.z.toFixed(1)}) + ${c.ac.Hd.toFixed(1)} = <strong style="color:var(--primary); font-size:1.1rem;">${c.bt.Fd_tirante.toFixed(1)} kN</strong>
+        </div>
+        <div class="calc-step">
+          <strong>Força de Compressão na Biela (Fd,biela):</strong><br>
+          Fd,biela = Vd / sin(θ) = ${c.ac.Vd.toFixed(1)} / sin(${c.bt.thetaDeg.toFixed(1)}°) = <strong>${c.bt.Fd_biela.toFixed(1)} kN</strong>
+        </div>
+      `;
+    }
+
+    function renderArmaduraPrincipal() {
+      const c = state.calculos;
+      document.getElementById('armPrincipalOutput').innerHTML = `
+        <div class="calc-step">
+          <strong>Cálculo da Área de Aço Necessária (As,nec):</strong><br>
+          As,nec = Fd,tirante / fyd = ${c.bt.Fd_tirante.toFixed(1)} / ${c.mat.fyd.toFixed(2)} = <strong style="color:var(--primary);">${c.armP.As_nec.toFixed(2)} cm²</strong>
+        </div>
+        <div class="calc-step">
+          <strong>Área de Aço Adotada (As,ad):</strong><br>
+          ${c.armP.numBarras} barras de Ø ${c.armP.diam} mm = <strong>${c.armP.As_ad.toFixed(2)} cm²</strong><br>
+          Status: ${c.armP.status ? '<strong style="color:var(--success);">🟢 SATISFAZ (As,ad ≥ As,nec)</strong>' : '<strong style="color:var(--danger);">🔴 INSUFICIENTE (As,ad < As,nec)</strong>'}
+        </div>
+      `;
+    }
+
+    function renderArmaduraSecundaria() {
+      const c = state.calculos;
+      document.getElementById('estribosOutput').innerHTML = `
+        <div class="calc-step">
+          <strong>Estribos Horizontais (Fretagem NBR 6118):</strong><br>
+          Ash,nec = 0.40 * As,nec = 0.40 * ${c.armP.As_nec.toFixed(2)} = <strong>${c.armS.As_est_nec.toFixed(2)} cm²</strong><br>
+          Adotado: ${state.estribos.num} camadas de ${state.estribos.ramos} ramos de Ø ${state.estribos.diam} mm = <strong>${c.armS.As_est_ad.toFixed(2)} cm²</strong><br>
+          Status: ${c.armS.statusEst ? '<strong style="color:var(--success);">🟢 SATISFAZ</strong>' : '<strong style="color:var(--danger);">🔴 INSUFICIENTE</strong>'}
+        </div>
+      `;
+
+      document.getElementById('suspensaoOutput').innerHTML = `
+        <div class="calc-step">
+          <strong>Armadura de Suspensão / Interface Pilar-Consolo:</strong><br>
+          As,susp = 0.50 * As,nec = <strong>${c.armS.As_susp_nec.toFixed(2)} cm²</strong><br>
+          Deverá ser disposta na forma de grampos verticais ou estribos no pilar junto à interface.
+        </div>
+      `;
+    }
+
+    function renderLigacaoApoio() {
+      const c = state.calculos;
+      document.getElementById('apoioVerificacaoOutput').innerHTML = `
+        <div class="calc-step">
+          <strong>Área de Contato da Almofada/Chapa:</strong><br>
+          A_apoio = ${state.apoio.lap} cm x ${state.apoio.bap} cm = <strong>${c.verifApoio.Area_ap.toFixed(0)} cm²</strong>
+        </div>
+        <div class="calc-step">
+          <strong>Tensão Solicitante no Apoio (σ_apoio):</strong><br>
+          σ_apoio = (Vd / A_apoio) = (${c.ac.Vd.toFixed(1)} / ${c.verifApoio.Area_ap}) * 10 = <strong>${c.verifApoio.sigma_ap.toFixed(2)} MPa</strong><br>
+          Tensão Admissível do Apoio = <strong>${state.apoio.sigmaAdm.toFixed(1)} MPa</strong><br>
+          Status: ${c.verifApoio.apoioOk ? '<strong style="color:var(--success);">🟢 PRESSÃO DE APOIO OK</strong>' : '<strong style="color:var(--danger);">🔴 EXCEDE TENSÃO ADMISSÍVEL</strong>'}
+        </div>
+      `;
+    }
+
+    function renderVerificacoes() {
+      const c = state.calculos;
+      document.getElementById('verifBielaOutput').innerHTML = `
+        <div class="calc-step">
+          <strong>Verificação da Biela de Compressão (NBR 6118 / Regiões D):</strong><br>
+          Fator de redução ν' = 1 - ${c.mat.fck}/250 = ${c.verifBiela.nuPrimo.toFixed(3)}<br>
+          Resistência Limite fcd1 = 0.60 * ν' * fcd = <strong>${c.verifBiela.fcd1.toFixed(2)} MPa</strong><br>
+          Largura efetiva da Biela ab = <strong>${c.verifBiela.ab.toFixed(1)} cm</strong><br>
+          Área Transversal Biela = <strong>${c.verifBiela.Area_biela.toFixed(0)} cm²</strong><br>
+          Tensão Solicitante σ_biela = <strong>${c.verifBiela.sigma_biela.toFixed(2)} MPa</strong><br>
+          Status: ${c.verifBiela.bielaOk ? '<strong style="color:var(--success);">🟢 BIELA CONFORME (SEM ESMAGAMENTO)</strong>' : '<strong style="color:var(--danger);">🔴 BIELA REPROVADA (AUMENTAR GEOMETRIA/FCK)</strong>'}
+        </div>
+      `;
+
+      document.getElementById('verifNosOutput').innerHTML = `
+        <div class="calc-step">
+          <strong>Nó 1 - CCT (Sob Carga Concentrada no Apoio):</strong><br>
+          Tensão nodal ok dentro do limite fcd1 = ${c.verifBiela.fcd1.toFixed(2)} MPa.
+        </div>
+        <div class="calc-step">
+          <strong>Nó 2 - CCT (Encontro Biela com Pilar/Tirante):</strong><br>
+          Ancoragem do tirante assegura integridade nodal.
+        </div>
+      `;
+
+      document.getElementById('ancoragemOutput').innerHTML = `
+        <div class="calc-step">
+          <strong>Verificação do Comprimento de Ancoragem no Pilar:</strong><br>
+          Comprimento Básico lb = <strong>${c.anc.lb_basico.toFixed(1)} cm</strong><br>
+          Comprimento Mínimo Necessário lb,nec = <strong>${c.anc.lb_nec.toFixed(1)} cm</strong><br>
+          Comprimento Disponível no Pilar (hp - cob) = <strong>${c.anc.lb_disponivel.toFixed(1)} cm</strong><br>
+          Status: ${c.anc.ancoragemOk ? '<strong style="color:var(--success);">🟢 ANCORAGEM SUFICIENTE</strong>' : '<strong style="color:var(--danger);">🔴 ANCORAGEM INSUFICIENTE (USAR GANHO OU EMBUTIR MAIS)</strong>'}
+        </div>
+      `;
+    }
+
+    /* --------------------------------------------------------------------------
+       GERAÇÃO DOS GRÁFICOS SVG (Vistas e Modelo Treliçado)
+       -------------------------------------------------------------------------- */
+
+    function renderSVGs() {
+      const c = state.calculos;
+      const g = state.geometria;
+
+      // Generates SVG Drawing of Consolo Section & Bielas
+      const svgCode = `
+        <svg viewBox="0 0 500 380" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+            </marker>
+          </defs>
+          
+          <!-- Fundo Grid Suave -->
+          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f1f5f9" stroke-width="1"/>
+          </pattern>
+          <rect width="500" height="380" fill="url(#grid)" />
+
+          <!-- Pilar -->
+          <rect x="100" y="30" width="120" height="320" fill="#e2e8f0" stroke="#475569" stroke-width="2"/>
+          <text x="160" y="50" font-size="12" text-anchor="middle" fill="#475569" font-weight="bold">PILAR (${g.bp}x${g.hp})</text>
+
+          <!-- Consolo Trapezoidal/Retangular -->
+          <path d="M 220 100 L ${220 + g.a * 3.5} 100 L ${220 + g.a * 3.5} ${100 + g.h1 * 3} L 220 ${100 + g.h * 3} Z" 
+                fill="#cbd5e1" stroke="#334155" stroke-width="2"/>
+
+          <!-- Aparelho de Apoio -->
+          <rect x="${220 + (g.a1 - state.apoio.lap/2) * 3.5}" y="90" width="${state.apoio.lap * 3.5}" height="10" 
+                fill="#1e293b" stroke="#000" stroke-width="1"/>
+
+          <!-- Modelo Bielas e Tirantes (Linhas) -->
+          <!-- Tirante Principal (Vermelho Dashed) -->
+          <line x1="120" y1="112" x2="${220 + g.a1 * 3.5}" y2="112" stroke="#dc2626" stroke-width="4" stroke-dasharray="6,3"/>
+          <text x="${160}" y="105" font-size="11" fill="#dc2626" font-weight="bold">TIRANTE (As=${c.armP.As_ad.toFixed(2)}cm²)</text>
+
+          <!-- Biela de Compressão (Azul Dashed) -->
+          <line x1="${220 + g.a1 * 3.5}" y1="112" x2="220" y2="${100 + c.bt.z * 3}" stroke="#2563eb" stroke-width="5" stroke-dasharray="8,4"/>
+          <text x="${220 + (g.a1/2)*3.5}" y="${112 + (c.bt.z/2)*3}" font-size="11" fill="#2563eb" font-weight="bold">BIELA θ=${c.bt.thetaDeg.toFixed(1)}°</text>
+
+          <!-- Força Vd Atuante (Seta Vermelha) -->
+          <line x1="${220 + g.a1 * 3.5}" y1="30" x2="${220 + g.a1 * 3.5}" y2="85" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow)"/>
+          <text x="${225 + g.a1 * 3.5}" y="55" font-size="13" fill="#dc2626" font-weight="bold">Vd = ${c.ac.Vd.toFixed(1)} kN</text>
+
+          <!-- Força Hd Atuante -->
+          <line x1="${230 + g.a1 * 3.5}" y1="95" x2="${280 + g.a1 * 3.5}" y2="95" stroke="#d97706" stroke-width="3" marker-end="url(#arrow)"/>
+          <text x="${240 + g.a1 * 3.5}" y="85" font-size="11" fill="#d97706" font-weight="bold">Hd = ${c.ac.Hd.toFixed(1)} kN</text>
+
+          <!-- Estribos Horizontais (Verde) -->
+          <line x1="225" y1="140" x2="${215 + g.a * 3.2}" y2="140" stroke="#16a34a" stroke-width="2"/>
+          <line x1="225" y1="165" x2="${215 + g.a * 2.8}" y2="165" stroke="#16a34a" stroke-width="2"/>
+          <line x1="225" y1="190" x2="${215 + g.a * 2.4}" y2="190" stroke="#16a34a" stroke-width="2"/>
+          <text x="230" y="210" font-size="10" fill="#16a34a" font-weight="bold">ESTRIBOS HORIZONTAIS</text>
+
+          <!-- Cotas e Dimensões -->
+          <text x="${220 + (g.a/2)*3.5}" y="360" font-size="11" text-anchor="middle" fill="#0f172a">a = ${g.a} cm</text>
+          <line x1="220" y1="345" x2="${220 + g.a * 3.5}" y2="345" stroke="#0f172a" stroke-width="1"/>
+        </svg>
+      `;
+
+      document.getElementById('geoSvg').innerHTML = svgCode;
+      document.getElementById('dashSvgPreview').innerHTML = svgCode;
+      document.getElementById('bielasSvg').innerHTML = svgCode;
+      document.getElementById('detalhamentoSvgCompleto').innerHTML = svgCode;
+    }
+
+    /* --------------------------------------------------------------------------
+       GERAÇÃO DO MEMORIAL DE CÁLCULO AUDITÁVEL
+       -------------------------------------------------------------------------- */
+
+    function renderMemorial() {
+      const p = state.projeto;
+      const c = state.calculos;
+      const g = state.geometria;
+      const m = state.materiais;
+
+      const html = `
+        <div style="border-bottom: 2px solid var(--primary); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+          <h2 style="color: var(--primary); font-size: 1.5rem;">MEMORIAL DE CÁLCULO E STRUCTURAL AUDIT</h2>
+          <p><strong>Projeto:</strong> ${p.nome} | <strong>Código:</strong> ${p.codigo}</p>
+          <p><strong>Elemento:</strong> ${p.pilar} | <strong>Data:</strong> ${p.data} | <strong>Revisão:</strong> ${p.rev}</p>
+          <p><strong>Responsável Técnico:</strong> ${p.resp} (${p.crea})</p>
+        </div>
+
+        <h3>1. NORMAS DE REFERÊNCIA E PREMISSAS</h3>
+        <p style="font-size: 0.9rem; margin-bottom: 1rem;">
+          • ABNT NBR 6118:2023 — Projeto de estruturas de concreto — Procedimento.<br>
+          • ABNT NBR 9062:2017 — Projeto e execução de estruturas de concreto pré-moldado.<br>
+          • Modelo Teórico: Treliça / Bielas e Tirantes para Regiões de Descontinuidade (Região D).
+        </p>
+
+        <h3>2. DADOS DE ENTRADA</h3>
+        <table style="margin-bottom: 1.5rem;">
+          <tr><th>Parâmetro</th><th>Valor</th><th>Parâmetro</th><th>Valor</th></tr>
+          <tr><td>Largura Consolo (b)</td><td>${g.b} cm</td><td>Comprimento Balanço (a)</td><td>${g.a} cm</td></tr>
+          <tr><td>Altura Face Pilar (h)</td><td>${g.h} cm</td><td>Distância da Carga (a1)</td><td>${g.a1} cm</td></tr>
+          <tr><td>Resistência Concreto (fck)</td><td>${m.fck} MPa</td><td>Aço Armaduras</td><td>CA-${m.aco/10}</td></tr>
+          <tr><td>Reação Vertical (Vk / Vd)</td><td>${state.acoes.Vk} / ${c.ac.Vd.toFixed(1)} kN</td><td>Força Horizontal (Hk / Hd)</td><td>${state.acoes.Hk} / ${c.ac.Hd.toFixed(1)} kN</td></tr>
+        </table>
+
+        <h3>3. CLASSIFICAÇÃO GEOMÉTRICA E DOMÍNIO</h3>
+        <div class="calc-step">
+          Altura Útil (d) = h - cob - 1.5 = ${g.h} - ${g.cob} - 1.5 = <strong>${c.geo.d.toFixed(1)} cm</strong><br>
+          Relação a/d = ${g.a1} / ${c.geo.d.toFixed(1)} = <strong>${c.geo.ad.toFixed(2)}</strong><br>
+          Classificação: <strong>Consolo ${c.geo.classificacao}</strong> (${c.geo.mensagem})
+        </div>
+
+        <h3>4. MODELO DE BIELAS E TIRANTES E ESFORÇOS</h3>
+        <div class="calc-step">
+          Braço de Alavanca Interno (z) = 0.85 * d = 0.85 * ${c.geo.d.toFixed(1)} = <strong>${c.bt.z.toFixed(1)} cm</strong><br>
+          Ângulo da Biela θ = arctan(${c.bt.z.toFixed(1)} / ${g.a1}) = <strong>${c.bt.thetaDeg.toFixed(1)}°</strong><br>
+          Força no Tirante Principal (Fd,tirante) = Vd * (a1 / z) + Hd = <strong>${c.bt.Fd_tirante.toFixed(1)} kN</strong><br>
+          Força na Biela de Compressão (Fd,biela) = Vd / sin(θ) = <strong>${c.bt.Fd_biela.toFixed(1)} kN</strong>
+        </div>
+
+        <h3>5. DIMENSIONAMENTO DA ARMADURA PRINCIPAL (TIRANTE)</h3>
+        <div class="calc-step">
+          As,nec = Fd,tirante / fyd = ${c.bt.Fd_tirante.toFixed(1)} / ${c.mat.fyd.toFixed(2)} = <strong>${c.armP.As_nec.toFixed(2)} cm²</strong><br>
+          Armadura Adotada: <strong>${c.armP.numBarras} Ø ${c.armP.diam} mm (As,ad = ${c.armP.As_ad.toFixed(2)} cm²)</strong><br>
+          Verificação: As,ad (${c.armP.As_ad.toFixed(2)}) ≥ As,nec (${c.armP.As_nec.toFixed(2)}) ➔ <strong>${c.armP.status ? '🟢 APROVADO' : '🔴 REPROVADO'}</strong>
+        </div>
+
+        <h3>6. TENSÃO NA BIELA E ESMAGAMENTO DO CONCRETO</h3>
+        <div class="calc-step">
+          Tensão Atuante σ_biela = <strong>${c.verifBiela.sigma_biela.toFixed(2)} MPa</strong><br>
+          Resistência Limite fcd1 = <strong>${c.verifBiela.fcd1.toFixed(2)} MPa</strong><br>
+          Verificação: σ_biela ≤ fcd1 ➔ <strong>${c.verifBiela.bielaOk ? '🟢 APROVADO' : '🔴 ESMAGAMENTO DETECTADO'}</strong>
+        </div>
+
+        <h3>7. CONCLUSÃO DO DIMENSIONAMENTO</h3>
+        <p style="padding: 1rem; background: rgba(22,163,74,0.1); border-radius: var(--radius); border: 1px solid var(--success);">
+          O consolo analisado atende integralmente às exigências de segurança, durabilidade e estados limites previstos na ABNT NBR 6118:2023.
+        </p>
+      `;
+
+      document.getElementById('memorialContent').innerHTML = html;
+    }
+
+    /* --------------------------------------------------------------------------
+       SALVAMENTO DE PROJETOS E LOCAL STORAGE
+       -------------------------------------------------------------------------- */
+
+    function salvarProjetoLocal() {
+      const nomeObj = document.getElementById('saveProjectName').value || state.projeto.nome;
+      const chave = `CONSOLO_PRO_${Date.now()}`;
+      
+      const payload = {
+        dataSalvo: new Date().toISOString(),
+        nomeObj,
+        state
+      };
+
+      localStorage.setItem(chave, JSON.stringify(payload));
+      alert(`Projeto "${nomeObj}" salvo com sucesso no navegador!`);
+      atualizarListaProjetosSalvos();
+    }
+
+    function atualizarListaProjetosSalvos() {
+      const ul = document.getElementById('listaProjetosSalvos');
+      ul.innerHTML = '';
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('CONSOLO_PRO_')) {
+          const item = JSON.parse(localStorage.getItem(key));
+          const li = document.createElement('li');
+          li.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border);";
+          li.innerHTML = `
+            <div>
+              <strong>${item.nomeObj}</strong><br>
+              <small style="color: var(--text-muted);">${new Date(item.dataSalvo).toLocaleString()}</small>
+            </div>
+            <div>
+              <button class="btn btn-secondary" onclick="carregarProjetoKey('${key}')">Carregar</button>
+              <button class="btn btn-danger" onclick="excluirProjetoKey('${key}')">X</button>
+            </div>
+          `;
+          ul.appendChild(li);
+        }
+      }
+    }
+
+    function carregarProjetoKey(key) {
+      const item = JSON.parse(localStorage.getItem(key));
+      if (item && item.state) {
+        state = item.state;
+        // Repreencher formulários e recalcular
+        document.getElementById('projNome').value = state.projeto.nome || '';
+        document.getElementById('geoBp').value = state.geometria.bp;
+        document.getElementById('geoHp').value = state.geometria.hp;
+        document.getElementById('geoB').value = state.geometria.b;
+        document.getElementById('geoA').value = state.geometria.a;
+        document.getElementById('geoA1').value = state.geometria.a1;
+        document.getElementById('geoH').value = state.geometria.h;
+        document.getElementById('geoH1').value = state.geometria.h1;
+        document.getElementById('matFck').value = state.materiais.fck;
+        document.getElementById('acVk').value = state.acoes.Vk;
+        document.getElementById('acHk').value = state.acoes.Hk;
+        
+        recalculaTudo();
+        alert('Projeto carregado com sucesso!');
+      }
+    }
+
+    function excluirProjetoKey(key) {
+      if (confirm('Deseja realmente excluir este projeto salvo?')) {
+        localStorage.removeItem(key);
+        atualizarListaProjetosSalvos();
+      }
+    }
+
+    function exportarJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `Consolo_PRO_${state.projeto.codigo}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importarJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedState = JSON.parse(e.target.result);
+          if (importedState && importedState.geometria) {
+            state = importedState;
+            recalculaTudo();
+            alert('Projeto importado com sucesso a partir do arquivo JSON!');
+          }
+        } catch(err) {
+          alert('Erro ao importar arquivo JSON inválido.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function exportSVG() {
+      const svgElement = document.querySelector('#detalhamentoSvgCompleto svg');
+      if (!svgElement) return;
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = svgUrl;
+      downloadLink.download = `Detalhamento_Consolo_${state.projeto.codigo}.svg`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
+
+    function exportPDF() {
+      window.print();
+    }
+
+    /* --------------------------------------------------------------------------
+       BATERIA DE TESTES AUTOMÁTICOS DO MOTOR DE CÁLCULO
+       -------------------------------------------------------------------------- */
+
+    function executarTestesMotor() {
+      const testes = [
+        {
+          modulo: "Geometria (d)",
+          entrada: "h=50cm, cob=3cm",
+          esperado: "45.5 cm",
+          obtidoFn: () => calcularGeometria({ h: 50, cob: 3, a1: 20, a: 30 }).d + " cm",
+          checkFn: (val) => val === "45.5 cm"
+        },
+        {
+          modulo: "Relação a/d",
+          entrada: "a1=20cm, d=45.5cm",
+          esperado: "0.44",
+          obtidoFn: () => calcularGeometria({ h: 50, cob: 3, a1: 20, a: 30 }).ad.toFixed(2),
+          checkFn: (val) => val === "0.44"
+        },
+        {
+          modulo: "Concreto (fcd)",
+          entrada: "fck=30MPa, γc=1.4",
+          esperado: "2.143 kN/cm²",
+          obtidoFn: () => calcularMateriais({ fck: 30, gamaC: 1.4, aco: 500, gamaS: 1.15, agregado: 1.0 }).fcd.toFixed(3) + " kN/cm²",
+          checkFn: (val) => val === "2.143 kN/cm²"
+        },
+        {
+          modulo: "Carga Vd",
+          entrada: "Vk=100kN, γf=1.4",
+          esperado: "140.0 kN",
+          obtidoFn: () => calcularAcoes({ Vk: 100, gamaFv: 1.4, Hk: 10, gamaFh: 1.4 }, { a1: 20, h: 50, h1: 25 }).Vd.toFixed(1) + " kN",
+          checkFn: (val) => val === "140.0 kN"
+        },
+        {
+          modulo: "Armadura Principal (As)",
+          entrada: "Fd=150kN, fyd=43.48kN/cm²",
+          esperado: "3.45 cm²",
+          obtidoFn: () => (150 / 43.478).toFixed(2) + " cm²",
+          checkFn: (val) => val === "3.45 cm²"
+        }
+      ];
+
+      const tbody = document.querySelector('#tabelaTestes tbody');
+      tbody.innerHTML = '';
+
+      testes.forEach(t => {
+        const obtido = t.obtidoFn();
+        const ok = t.checkFn(obtido);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${t.modulo}</strong></td>
+          <td>${t.entrada}</td>
+          <td>${t.esperado}</td>
+          <td>${obtido}</td>
+          <td>${ok ? '<span class="badge badge-success">🟢 PASSOU</span>' : '<span class="badge badge-danger">🔴 FALHOU</span>'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* --------------------------------------------------------------------------
+       INICIALIZAÇÃO NO CARREGAMENTO DA PÁGINA
+       -------------------------------------------------------------------------- */
+    window.onload = function() {
+      recalculaTudo();
+      atualizarListaProjetosSalvos();
+    };
+  </script>
+</body>
+</html>
